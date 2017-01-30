@@ -353,7 +353,7 @@ public class BubbleService extends Service {
                             stopSelf();
                         }
 
-                        if (endTime - startTime < 100) {
+                        if ((endTime - startTime) < 200) {
                             bubbleLayout_click();
                         }
                         break;
@@ -381,20 +381,28 @@ public class BubbleService extends Service {
     boolean isClicked = false;
 
     private void bubbleLayout_click() {
+        int screenheight_percent = screenHeight/100;
+        int screenWidth_percent = screenWidth/100;
+
         if (isClicked) {
             iv_bubble.animate().scaleX(1f).scaleY(1f).setDuration(ANIMATION_DURATION_MEDIUM).setInterpolator(new OvershootInterpolator());
             iv_innerCircle.setVisibility(View.VISIBLE);
             iv_innerPlus.animate().setDuration(ANIMATION_DURATION_SLOW).rotation(-135);
             iv_innerPlus.setVisibility(View.GONE);
-            sub_bubbles_layout1.setVisibility(View.GONE);
-            sub_bubbles_layout2.setVisibility(View.GONE);
-            sub_bubbles_layout3.setVisibility(View.GONE);
-            sub_bubbles_layout4.setVisibility(View.GONE);
-            sub_bubbles_layout5.setVisibility(View.GONE);
 
+            collapse(2*screenWidth_percent,pointerY -18*screenheight_percent,0,pointerY,sub_bubbles_layout1,sub_bubbles_layoutParams1);
+
+            collapse(23*screenWidth_percent,pointerY - 13*screenheight_percent,0,pointerY,sub_bubbles_layout2,sub_bubbles_layoutParams2);
+
+            collapse(30*screenWidth_percent,pointerY,0,pointerY,sub_bubbles_layout3,sub_bubbles_layoutParams3);
+
+            collapse(23*screenWidth_percent,pointerY + 13*screenheight_percent,0,pointerY,sub_bubbles_layout4,sub_bubbles_layoutParams4);
+
+            collapse(2*screenWidth_percent,pointerY + 18*screenheight_percent,0,pointerY,sub_bubbles_layout5,sub_bubbles_layoutParams5);
 
 
             isClicked = false;
+
         } else {
             iv_bubble.animate().scaleX(.85f).scaleY(.85f).setDuration(ANIMATION_DURATION_MEDIUM).setInterpolator(new OvershootInterpolator());
             iv_innerCircle.setVisibility(View.GONE);
@@ -402,32 +410,17 @@ public class BubbleService extends Service {
             iv_innerPlus.animate().setDuration(ANIMATION_DURATION_SLOW).rotation(135);
 
            // bubble is in the left assumed here
-            int screenheight_percent = screenHeight/100;
-            int screenWidth_percent = screenWidth/100;
-            sub_bubbles_layoutParams1.x = 2*screenWidth_percent;
-            sub_bubbles_layoutParams1.y = pointerY -18*screenheight_percent ;
-            windowManager.updateViewLayout(sub_bubbles_layout1, sub_bubbles_layoutParams1);
-            sub_bubbles_layout1.setVisibility(View.VISIBLE);
 
-            sub_bubbles_layoutParams2.x =  23*screenWidth_percent;
-            sub_bubbles_layoutParams2.y = pointerY - 13*screenheight_percent ;
-            windowManager.updateViewLayout(sub_bubbles_layout2, sub_bubbles_layoutParams2);
-            sub_bubbles_layout2.setVisibility(View.VISIBLE);
+            expand(0,pointerY,(2*(screenWidth_percent)),pointerY -(18*(screenheight_percent)),sub_bubbles_layout1,sub_bubbles_layoutParams1);
 
-            sub_bubbles_layoutParams3.x =  30*screenWidth_percent;
-            sub_bubbles_layoutParams3.y = pointerY;
-            windowManager.updateViewLayout(sub_bubbles_layout3, sub_bubbles_layoutParams3);
-            sub_bubbles_layout3.setVisibility(View.VISIBLE);
 
-            sub_bubbles_layoutParams4.x =  23*screenWidth_percent;;
-            sub_bubbles_layoutParams4.y = pointerY + 13*screenheight_percent;
-            windowManager.updateViewLayout(sub_bubbles_layout4, sub_bubbles_layoutParams4);
-            sub_bubbles_layout4.setVisibility(View.VISIBLE);
+            expand(0,pointerY,(23*(screenWidth_percent)),pointerY - (13*(screenheight_percent)),sub_bubbles_layout2,sub_bubbles_layoutParams2);
 
-            sub_bubbles_layoutParams5.x =  2*screenWidth_percent;
-            sub_bubbles_layoutParams5.y = pointerY + 18*screenheight_percent;
-            windowManager.updateViewLayout(sub_bubbles_layout5, sub_bubbles_layoutParams5);
-            sub_bubbles_layout5.setVisibility(View.VISIBLE);
+            expand(0,pointerY,(30*(screenWidth_percent)),pointerY,sub_bubbles_layout3,sub_bubbles_layoutParams3);
+
+            expand(0,pointerY,(23*(screenWidth_percent)),pointerY + (13*(screenheight_percent)),sub_bubbles_layout4,sub_bubbles_layoutParams4);
+
+            expand(0,pointerY,(2*(screenWidth_percent)),pointerY + (18*(screenheight_percent)),sub_bubbles_layout5,sub_bubbles_layoutParams5);
 
             isClicked = true;
         }
@@ -435,6 +428,59 @@ public class BubbleService extends Service {
 
     }
 
+
+
+    private void expand(final int initialValueX, final int initialValueY, int finalValueX, int finalValueY, final FrameLayout subLayout, final WindowManager.LayoutParams subLayoutParams) {
+        final int diffX = finalValueX-initialValueX;
+        final int diffY = finalValueY- initialValueY;
+        ObjectAnimator objectAnimator = new ObjectAnimator();
+        objectAnimator.setDuration(ANIMATION_DURATION_MEDIUM);
+        objectAnimator.setFloatValues(0,100);
+        objectAnimator.setInterpolator(new OvershootInterpolator());
+        objectAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float value = (float) valueAnimator.getAnimatedValue();
+
+                float currentX = initialValueX + (diffX * value/100);
+                float currentY = initialValueY + (diffY * value/100);
+                subLayoutParams.x = (int) currentX;
+                subLayoutParams.y = (int) currentY;
+                windowManager.updateViewLayout(subLayout, subLayoutParams);
+            }
+        });
+        objectAnimator.start();
+        subLayout.setVisibility(View.VISIBLE);
+    }
+    private void collapse(final int initialValueX, final int initialValueY, int finalValueX, int finalValueY, final FrameLayout subLayout, final WindowManager.LayoutParams subLayoutParams) {
+        final int diffX =initialValueX- finalValueX;
+        final int diffY = initialValueY- finalValueY;
+
+        ObjectAnimator objectAnimator = new ObjectAnimator();
+        objectAnimator.setDuration(200);
+        objectAnimator.setFloatValues(0,100);
+        objectAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float value = (float) valueAnimator.getAnimatedValue();
+
+                float currentX = initialValueX - (diffX * value/100);
+                float currentY = initialValueY - (diffY * value/100);
+                subLayoutParams.x = (int) currentX;
+                subLayoutParams.y = (int) currentY;
+                windowManager.updateViewLayout(subLayout, subLayoutParams);
+               Handler handler = new Handler();
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        subLayout.setVisibility(View.GONE);
+                    }
+                };
+                handler.postDelayed(runnable,1);
+            }
+        });objectAnimator.start();
+
+    }
 
     public int getStatusBarHeight() {
         int result = 0;
