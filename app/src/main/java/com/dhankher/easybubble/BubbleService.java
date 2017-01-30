@@ -66,7 +66,9 @@ public class BubbleService extends Service {
         Point size = new Point();
         display.getSize(size);
         screenWidth = size.x;
+        Log.d(TAG, "screenWidth "+screenWidth);
         screenHeight = size.y;
+        Log.d(TAG, "screenheight "+screenHeight);
 
 
         layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -198,6 +200,15 @@ public class BubbleService extends Service {
                         break;
                     case MotionEvent.ACTION_MOVE:
                         if (isLongClick) {
+
+                            iv_innerPlus.setVisibility(View.GONE);
+                            sub_bubbles_layout1.setVisibility(View.GONE);
+                            sub_bubbles_layout2.setVisibility(View.GONE);
+                            sub_bubbles_layout3.setVisibility(View.GONE);
+                            sub_bubbles_layout4.setVisibility(View.GONE);
+                            sub_bubbles_layout5.setVisibility(View.GONE);
+
+
                             pointerX = (int) motionEvent.getRawX() - radius;
                             pointerY = (int) motionEvent.getRawY() - statusBarHeight - radius;
                             bubbleParams.x = pointerX;
@@ -331,6 +342,17 @@ public class BubbleService extends Service {
                             }
                         }
 
+                        if ((pointerX > (removeViewX - 120) && pointerX < (removeViewX + 120 + (radius * 2))) && (pointerY > (removeViewY - 120) && pointerY < (removeViewY + 120))) {
+                            windowManager.removeViewImmediate(bubbleLayout);
+                            windowManager.removeViewImmediate(removeLayout);
+                            windowManager.removeViewImmediate(sub_bubbles_layout1);
+                            windowManager.removeViewImmediate(sub_bubbles_layout2);
+                            windowManager.removeViewImmediate(sub_bubbles_layout3);
+                            windowManager.removeViewImmediate(sub_bubbles_layout4);
+                            windowManager.removeViewImmediate(sub_bubbles_layout5);
+                            stopSelf();
+                        }
+
                         if (endTime - startTime < 100) {
                             bubbleLayout_click();
                         }
@@ -380,28 +402,30 @@ public class BubbleService extends Service {
             iv_innerPlus.animate().setDuration(ANIMATION_DURATION_SLOW).rotation(135);
 
            // bubble is in the left assumed here
-            sub_bubbles_layoutParams1.x =  10;
-            sub_bubbles_layoutParams1.y = pointerY - 210;
+            int screenheight_percent = screenHeight/100;
+            int screenWidth_percent = screenWidth/100;
+            sub_bubbles_layoutParams1.x = 2*screenWidth_percent;
+            sub_bubbles_layoutParams1.y = pointerY -18*screenheight_percent ;
             windowManager.updateViewLayout(sub_bubbles_layout1, sub_bubbles_layoutParams1);
             sub_bubbles_layout1.setVisibility(View.VISIBLE);
 
-            sub_bubbles_layoutParams2.x =  175;
-            sub_bubbles_layoutParams2.y = pointerY - 145;
+            sub_bubbles_layoutParams2.x =  23*screenWidth_percent;
+            sub_bubbles_layoutParams2.y = pointerY - 13*screenheight_percent ;
             windowManager.updateViewLayout(sub_bubbles_layout2, sub_bubbles_layoutParams2);
             sub_bubbles_layout2.setVisibility(View.VISIBLE);
 
-            sub_bubbles_layoutParams3.x =  240;
+            sub_bubbles_layoutParams3.x =  30*screenWidth_percent;
             sub_bubbles_layoutParams3.y = pointerY;
             windowManager.updateViewLayout(sub_bubbles_layout3, sub_bubbles_layoutParams3);
             sub_bubbles_layout3.setVisibility(View.VISIBLE);
 
-            sub_bubbles_layoutParams4.x =  175;
-            sub_bubbles_layoutParams4.y = pointerY + 145;
+            sub_bubbles_layoutParams4.x =  23*screenWidth_percent;;
+            sub_bubbles_layoutParams4.y = pointerY + 13*screenheight_percent;
             windowManager.updateViewLayout(sub_bubbles_layout4, sub_bubbles_layoutParams4);
             sub_bubbles_layout4.setVisibility(View.VISIBLE);
 
-            sub_bubbles_layoutParams5.x =  10;
-            sub_bubbles_layoutParams5.y = pointerY + 210;
+            sub_bubbles_layoutParams5.x =  2*screenWidth_percent;
+            sub_bubbles_layoutParams5.y = pointerY + 18*screenheight_percent;
             windowManager.updateViewLayout(sub_bubbles_layout5, sub_bubbles_layoutParams5);
             sub_bubbles_layout5.setVisibility(View.VISIBLE);
 
