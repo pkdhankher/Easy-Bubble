@@ -32,9 +32,9 @@ import static android.content.ContentValues.TAG;
 public class BubbleService extends Service {
 
     WindowManager windowManager;
-    WindowManager.LayoutParams bubbleParams, removeParams, sub_bubbles_layoutParams1, sub_bubbles_layoutParams2,sub_bubbles_layoutParams3,sub_bubbles_layoutParams4,sub_bubbles_layoutParams5;
+    WindowManager.LayoutParams bubbleParams, removeParams, sub_bubbles_layoutParams1, sub_bubbles_layoutParams2, sub_bubbles_layoutParams3, sub_bubbles_layoutParams4, sub_bubbles_layoutParams5;
     LayoutInflater layoutInflater;
-    FrameLayout bubbleLayout, removeLayout, subBubblesLayout, imgframe, sub_bubbles_layout1, sub_bubbles_layout2,sub_bubbles_layout3,sub_bubbles_layout4,sub_bubbles_layout5;
+    FrameLayout bubbleLayout, removeLayout, subBubblesLayout, imgframe, sub_bubbles_layout1, sub_bubbles_layout2, sub_bubbles_layout3, sub_bubbles_layout4, sub_bubbles_layout5;
     int screenWidth, screenHeight, statusBarHeight;
     int pointerX, pointerY, radius;
     ImageView removeImage;
@@ -42,12 +42,13 @@ public class BubbleService extends Service {
     ImageView iv_1, iv_2, iv_3, iv_4, iv_5;
     ObjectAnimator objectAnimatorTowardsRemoveView, objectAnimatorAwayFromRemoveView;
     private boolean isNearToRemoveView = false;
-    int removeViewX = 295, removeViewY = 1068;
+    int removeViewX = 303, removeViewY = 1076;
     private boolean isBubbleLeft = false;
     private final static int ANIMATION_DURATION_FAST = 100;
     private final static int ANIMATION_DURATION_MEDIUM = 300;
     private final static int ANIMATION_DURATION_SLOW = 500;
     private boolean isBubbleMove = false;
+    String bubblePosition;
 
 
     @Nullable
@@ -66,27 +67,12 @@ public class BubbleService extends Service {
         Point size = new Point();
         display.getSize(size);
         screenWidth = size.x;
-        Log.d(TAG, "screenWidth "+screenWidth);
+        Log.d(TAG, "screenWidth " + screenWidth);
         screenHeight = size.y;
-        Log.d(TAG, "screenheight "+screenHeight);
+        Log.d(TAG, "screenheight " + screenHeight);
 
 
         layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        bubbleLayout = (FrameLayout) layoutInflater.inflate(R.layout.main_bubble, null);
-        iv_innerCircle = (ImageView) bubbleLayout.findViewById(R.id.iv_InnerCircle);
-        iv_innerPlus = (ImageView) bubbleLayout.findViewById(R.id.iv_InnerPlus);
-        iv_bubble = (ImageView) bubbleLayout.findViewById(R.id.iv_bubble);
-        bubbleParams = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
-                        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH |
-                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                PixelFormat.TRANSLUCENT);
-        bubbleParams.gravity = Gravity.LEFT | Gravity.TOP;
-        windowManager.addView(bubbleLayout, bubbleParams);
-
         sub_bubbles_layout1 = (FrameLayout) layoutInflater.inflate(R.layout.sub_bubbles_layout1, null);
         iv_1 = (ImageView) sub_bubbles_layout1.findViewById(R.id.iv_1);
         sub_bubbles_layoutParams1 = new WindowManager.LayoutParams(
@@ -115,7 +101,7 @@ public class BubbleService extends Service {
         sub_bubbles_layoutParams2.gravity = Gravity.TOP | Gravity.LEFT;
         windowManager.addView(sub_bubbles_layout2, sub_bubbles_layoutParams2);
 
- ////////////////////////////
+
         sub_bubbles_layout3 = (FrameLayout) layoutInflater.inflate(R.layout.sub_bubbles_layout3, null);
         iv_3 = (ImageView) sub_bubbles_layout3.findViewById(R.id.iv_3);
         sub_bubbles_layoutParams3 = new WindowManager.LayoutParams(
@@ -161,6 +147,22 @@ public class BubbleService extends Service {
         windowManager.addView(sub_bubbles_layout5, sub_bubbles_layoutParams5);
 
 
+        bubbleLayout = (FrameLayout) layoutInflater.inflate(R.layout.main_bubble, null);
+        iv_innerCircle = (ImageView) bubbleLayout.findViewById(R.id.iv_InnerCircle);
+        iv_innerPlus = (ImageView) bubbleLayout.findViewById(R.id.iv_InnerPlus);
+        iv_bubble = (ImageView) bubbleLayout.findViewById(R.id.iv_bubble);
+        bubbleParams = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
+                        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH |
+                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                PixelFormat.TRANSLUCENT);
+        bubbleParams.gravity = Gravity.LEFT | Gravity.TOP;
+        windowManager.addView(bubbleLayout, bubbleParams);
+
+
         removeLayout = (FrameLayout) layoutInflater.inflate(R.layout.removeview, null);
         imgframe = (FrameLayout) removeLayout.findViewById(R.id.imgframe);
         removeImage = (ImageView) removeLayout.findViewById(R.id.removeimg);
@@ -174,6 +176,7 @@ public class BubbleService extends Service {
                 PixelFormat.TRANSLUCENT);
         removeParams.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
         windowManager.addView(removeLayout, removeParams);
+
 
         bubbleLayout.setOnTouchListener(new View.OnTouchListener() {
             long startTime, endTime;
@@ -309,6 +312,7 @@ public class BubbleService extends Service {
                         isBubbleLeft = (pointerX < (screenWidth / 2)) ? true : false;
                         if (isBubbleMove) {
                             if (isBubbleLeft) {
+                                bubblePosition = "left";
                                 ObjectAnimator objectAnimator = new ObjectAnimator();
                                 objectAnimator.setDuration(ANIMATION_DURATION_MEDIUM);
                                 objectAnimator.setFloatValues(pointerX, 0);
@@ -325,6 +329,7 @@ public class BubbleService extends Service {
                                 objectAnimator.start();
 
                             } else {
+                                bubblePosition = "right";
                                 ObjectAnimator objectAnimator = new ObjectAnimator();
                                 objectAnimator.setDuration(ANIMATION_DURATION_MEDIUM);
                                 objectAnimator.setFloatValues(pointerX, screenWidth - 2 * radius);
@@ -381,25 +386,36 @@ public class BubbleService extends Service {
     boolean isClicked = false;
 
     private void bubbleLayout_click() {
-        int screenheight_percent = screenHeight/100;
-        int screenWidth_percent = screenWidth/100;
+        int screenheight_percent = screenHeight / 100;
+        int screenWidth_percent = screenWidth / 100;
 
         if (isClicked) {
             iv_bubble.animate().scaleX(1f).scaleY(1f).setDuration(ANIMATION_DURATION_MEDIUM).setInterpolator(new OvershootInterpolator());
             iv_innerCircle.setVisibility(View.VISIBLE);
             iv_innerPlus.animate().setDuration(ANIMATION_DURATION_SLOW).rotation(-135);
             iv_innerPlus.setVisibility(View.GONE);
+            if (bubblePosition == "left") {
+                collapse(2 * screenWidth_percent, pointerY - 18 * screenheight_percent, 0, pointerY, sub_bubbles_layout1, sub_bubbles_layoutParams1);
 
-            collapse(2*screenWidth_percent,pointerY -18*screenheight_percent,0,pointerY,sub_bubbles_layout1,sub_bubbles_layoutParams1);
+                collapse(23 * screenWidth_percent, pointerY - 13 * screenheight_percent, 0, pointerY, sub_bubbles_layout2, sub_bubbles_layoutParams2);
 
-            collapse(23*screenWidth_percent,pointerY - 13*screenheight_percent,0,pointerY,sub_bubbles_layout2,sub_bubbles_layoutParams2);
+                collapse(30 * screenWidth_percent, pointerY, 0, pointerY, sub_bubbles_layout3, sub_bubbles_layoutParams3);
 
-            collapse(30*screenWidth_percent,pointerY,0,pointerY,sub_bubbles_layout3,sub_bubbles_layoutParams3);
+                collapse(23 * screenWidth_percent, pointerY + 13 * screenheight_percent, 0, pointerY, sub_bubbles_layout4, sub_bubbles_layoutParams4);
 
-            collapse(23*screenWidth_percent,pointerY + 13*screenheight_percent,0,pointerY,sub_bubbles_layout4,sub_bubbles_layoutParams4);
+                collapse(2 * screenWidth_percent, pointerY + 18 * screenheight_percent, 0, pointerY, sub_bubbles_layout5, sub_bubbles_layoutParams5);
+            }else if(bubblePosition == "right"){
 
-            collapse(2*screenWidth_percent,pointerY + 18*screenheight_percent,0,pointerY,sub_bubbles_layout5,sub_bubbles_layoutParams5);
+                collapse((screenWidth-(2*screenWidth_percent)-(2*radius)),pointerY - (18*screenheight_percent),   screenWidth-(2*radius), pointerY, sub_bubbles_layout1, sub_bubbles_layoutParams1);
 
+                collapse(screenWidth-(2*radius)-(23*(screenWidth_percent)), pointerY - (13 * (screenheight_percent)),   screenWidth-(2*radius), pointerY, sub_bubbles_layout2, sub_bubbles_layoutParams2);
+
+                collapse(screenWidth-(2*radius)-(30 * (screenWidth_percent)), pointerY,   screenWidth-(2*radius), pointerY, sub_bubbles_layout3, sub_bubbles_layoutParams3);
+
+                collapse(screenWidth-(2*radius)-(23*(screenWidth_percent)), pointerY + (13 * (screenheight_percent)),   screenWidth-(2*radius), pointerY, sub_bubbles_layout4, sub_bubbles_layoutParams4);
+
+                collapse((screenWidth-(2*screenWidth_percent)-(2*radius)),pointerY + (18*screenheight_percent),   screenWidth-(2*radius), pointerY, sub_bubbles_layout5, sub_bubbles_layoutParams5);
+            }
 
             isClicked = false;
 
@@ -409,19 +425,30 @@ public class BubbleService extends Service {
             iv_innerPlus.setVisibility(View.VISIBLE);
             iv_innerPlus.animate().setDuration(ANIMATION_DURATION_SLOW).rotation(135);
 
-           // bubble is in the left assumed here
+            // bubble is in the left assumed here
+            if (bubblePosition == "left") {
 
-            expand(0,pointerY,(2*(screenWidth_percent)),pointerY -(18*(screenheight_percent)),sub_bubbles_layout1,sub_bubbles_layoutParams1);
+                    expand(0, pointerY, (2 * (screenWidth_percent)), pointerY - (18 * (screenheight_percent)), sub_bubbles_layout1, sub_bubbles_layoutParams1);
 
+                    expand(0, pointerY, (23 * (screenWidth_percent)), pointerY - (13 * (screenheight_percent)), sub_bubbles_layout2, sub_bubbles_layoutParams2);
 
-            expand(0,pointerY,(23*(screenWidth_percent)),pointerY - (13*(screenheight_percent)),sub_bubbles_layout2,sub_bubbles_layoutParams2);
+                    expand(0, pointerY, (30 * (screenWidth_percent)), pointerY, sub_bubbles_layout3, sub_bubbles_layoutParams3);
 
-            expand(0,pointerY,(30*(screenWidth_percent)),pointerY,sub_bubbles_layout3,sub_bubbles_layoutParams3);
+                    expand(0, pointerY, (23 * (screenWidth_percent)), pointerY + (13 * (screenheight_percent)), sub_bubbles_layout4, sub_bubbles_layoutParams4);
 
-            expand(0,pointerY,(23*(screenWidth_percent)),pointerY + (13*(screenheight_percent)),sub_bubbles_layout4,sub_bubbles_layoutParams4);
+                    expand(0, pointerY, (2 * (screenWidth_percent)), pointerY + (18 * (screenheight_percent)), sub_bubbles_layout5, sub_bubbles_layoutParams5);
+                
+            } else if (bubblePosition == "right") {
+                expand(screenWidth-(2*radius), pointerY, (screenWidth-(2*screenWidth_percent)-(2*radius)), pointerY - (18*screenheight_percent), sub_bubbles_layout1, sub_bubbles_layoutParams1);
 
-            expand(0,pointerY,(2*(screenWidth_percent)),pointerY + (18*(screenheight_percent)),sub_bubbles_layout5,sub_bubbles_layoutParams5);
+                expand(screenWidth-(2*radius), pointerY, screenWidth-(2*radius)-(23*(screenWidth_percent)), pointerY - (13 * (screenheight_percent)), sub_bubbles_layout2, sub_bubbles_layoutParams2);
 
+                expand(screenWidth-(2*radius), pointerY, screenWidth-(2*radius)-(30 * (screenWidth_percent)), pointerY, sub_bubbles_layout3, sub_bubbles_layoutParams3);
+
+                expand(screenWidth-(2*radius), pointerY, screenWidth-(2*radius)-(23*(screenWidth_percent)), pointerY + (13 * (screenheight_percent)), sub_bubbles_layout4, sub_bubbles_layoutParams4);
+
+                expand(screenWidth-(2*radius), pointerY, (screenWidth-(2*screenWidth_percent)-(2*radius)), pointerY + (18*screenheight_percent), sub_bubbles_layout5, sub_bubbles_layoutParams5);
+            }
             isClicked = true;
         }
 
@@ -429,21 +456,20 @@ public class BubbleService extends Service {
     }
 
 
-
     private void expand(final int initialValueX, final int initialValueY, int finalValueX, int finalValueY, final FrameLayout subLayout, final WindowManager.LayoutParams subLayoutParams) {
-        final int diffX = finalValueX-initialValueX;
-        final int diffY = finalValueY- initialValueY;
+        final int diffX = finalValueX - initialValueX;
+        final int diffY = finalValueY - initialValueY;
         ObjectAnimator objectAnimator = new ObjectAnimator();
         objectAnimator.setDuration(ANIMATION_DURATION_MEDIUM);
-        objectAnimator.setFloatValues(0,100);
+        objectAnimator.setFloatValues(0, 100);
         objectAnimator.setInterpolator(new OvershootInterpolator());
         objectAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 float value = (float) valueAnimator.getAnimatedValue();
 
-                float currentX = initialValueX + (diffX * value/100);
-                float currentY = initialValueY + (diffY * value/100);
+                float currentX = initialValueX + (diffX * value / 100);
+                float currentY = initialValueY + (diffY * value / 100);
                 subLayoutParams.x = (int) currentX;
                 subLayoutParams.y = (int) currentY;
                 windowManager.updateViewLayout(subLayout, subLayoutParams);
@@ -452,33 +478,37 @@ public class BubbleService extends Service {
         objectAnimator.start();
         subLayout.setVisibility(View.VISIBLE);
     }
+
+
     private void collapse(final int initialValueX, final int initialValueY, int finalValueX, int finalValueY, final FrameLayout subLayout, final WindowManager.LayoutParams subLayoutParams) {
-        final int diffX =initialValueX- finalValueX;
-        final int diffY = initialValueY- finalValueY;
+        final int diffX = initialValueX - finalValueX;
+        final int diffY = initialValueY - finalValueY;
 
         ObjectAnimator objectAnimator = new ObjectAnimator();
         objectAnimator.setDuration(200);
-        objectAnimator.setFloatValues(0,100);
+        objectAnimator.setFloatValues(0, 100);
         objectAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 float value = (float) valueAnimator.getAnimatedValue();
 
-                float currentX = initialValueX - (diffX * value/100);
-                float currentY = initialValueY - (diffY * value/100);
+                float currentX = initialValueX - (diffX * value / 100);
+                float currentY = initialValueY - (diffY * value / 100);
                 subLayoutParams.x = (int) currentX;
                 subLayoutParams.y = (int) currentY;
                 windowManager.updateViewLayout(subLayout, subLayoutParams);
-               Handler handler = new Handler();
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        subLayout.setVisibility(View.GONE);
-                    }
-                };
-                handler.postDelayed(runnable,1);
+
+//               Handler handler = new Handler();
+//                Runnable runnable = new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        subLayout.setVisibility(View.GONE);
+//                    }
+//                };
+//                handler.postDelayed(runnable,100);
             }
-        });objectAnimator.start();
+        });
+        objectAnimator.start();
 
     }
 
