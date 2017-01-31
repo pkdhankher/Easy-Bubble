@@ -361,6 +361,9 @@ public class BubbleService extends Service {
                         }
 
                         if ((pointerX > (removeViewX - 120) && pointerX < (removeViewX + 120 + (radius * 2))) && (pointerY > (removeViewY - 120) && pointerY < (removeViewY + 120))) {
+                            objectAnimatorTowardsRemoveView.removeAllUpdateListeners();
+                            objectAnimatorAwayFromRemoveView.removeAllUpdateListeners();
+                            
                             windowManager.removeViewImmediate(bubbleLayout);
                             windowManager.removeViewImmediate(removeLayout);
                             windowManager.removeViewImmediate(sub_bubbles_layout1);
@@ -650,16 +653,36 @@ public class BubbleService extends Service {
                 windowManager.updateViewLayout(subLayout, subLayoutParams);
 
 //               Handler handler = new Handler();
-//                Runnable runnable = new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        subLayout.setVisibility(View.GONE);
-//                    }
-//                };
-//                handler.postDelayed(runnable,100);
+
             }
         });
         objectAnimator.start();
+        objectAnimator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+
+                sub_bubbles_layout1.setVisibility(View.GONE);
+                sub_bubbles_layout2.setVisibility(View.GONE);
+                sub_bubbles_layout3.setVisibility(View.GONE);
+                sub_bubbles_layout4.setVisibility(View.GONE);
+                sub_bubbles_layout5.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
 
     }
 
