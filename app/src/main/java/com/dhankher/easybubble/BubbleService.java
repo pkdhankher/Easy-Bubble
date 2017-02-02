@@ -53,16 +53,17 @@ public class BubbleService extends Service {
     public static int screenheight_percent = 0;
     public static int screenWidth_percent = 0;
     Context context;
-    BubbleService bubbleService;
+    static BubbleService bubbleService;
     AddingViewClass addingViewClass;
     WindowManager.LayoutParams currentVIew, previousView;
-
+    private static Updatable updatable;
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
+
 
     @Override
     public void onCreate() {
@@ -101,7 +102,7 @@ public class BubbleService extends Service {
         sub_bubbles_layout5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                for (int i = 0; i < 5; i++) {
+                for (int i = 0; i < 7; i++) {
                     addView(i);
                 }
             }
@@ -269,10 +270,21 @@ public class BubbleService extends Service {
                             }
                             isBubbleMove = true;
                         }
-
+                        updatable.onCoordinateUpdate(bubbleParams.x, bubbleParams.y);
                         break;
                     case MotionEvent.ACTION_UP:
                         isLongClick = false;
+
+                        if ((pointerX > (removeViewX - 120) && pointerX < (removeViewX + 120 + (radius * 2))) && (pointerY > (removeViewY - 120) && pointerY < (removeViewY + 120))) {
+                            windowManager.removeViewImmediate(bubbleLayout);
+                            windowManager.removeViewImmediate(removeLayout);
+//                            windowManager.removeViewImmediate(sub_bubbles_layout1);
+//                            windowManager.removeViewImmediate(sub_bubbles_layout2);
+//                            windowManager.removeViewImmediate(sub_bubbles_layout3);
+//                            windowManager.removeViewImmediate(sub_bubbles_layout4);
+                            windowManager.removeViewImmediate(sub_bubbles_layout5);
+                            stopSelf();
+                        }
 
                         removeLayout.setVisibility(View.GONE);
                         handler_longclick.removeCallbacks(runnable_longClick);
@@ -315,16 +327,6 @@ public class BubbleService extends Service {
                             }
                         }
 
-                        if ((pointerX > (removeViewX - 120) && pointerX < (removeViewX + 120 + (radius * 2))) && (pointerY > (removeViewY - 120) && pointerY < (removeViewY + 120))) {
-                            windowManager.removeViewImmediate(bubbleLayout);
-                            windowManager.removeViewImmediate(removeLayout);
-//                            windowManager.removeViewImmediate(sub_bubbles_layout1);
-//                            windowManager.removeViewImmediate(sub_bubbles_layout2);
-//                            windowManager.removeViewImmediate(sub_bubbles_layout3);
-//                            windowManager.removeViewImmediate(sub_bubbles_layout4);
-                            windowManager.removeViewImmediate(sub_bubbles_layout5);
-                            stopSelf();
-                        }
 
                         if ((endTime - startTime) < 200) {
                             bubbleLayout_click();
@@ -349,6 +351,10 @@ public class BubbleService extends Service {
             }
         });
 
+    }
+
+    public static void setUpdatable(Updatable updatable) {
+        BubbleService.updatable = updatable;
     }
 
     private void addView(int position) {
@@ -662,7 +668,7 @@ public class BubbleService extends Service {
         return result;
     }
 
-    public BubbleService getInstance() {
+    public static BubbleService getInstance() {
         return bubbleService;
     }
 }
