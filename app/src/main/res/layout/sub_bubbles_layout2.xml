@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:visibility="gone">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="visible">
 
-    <ImageView
-        android:id="@+id/iv_2"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
-        android:background="@drawable/circle" />
-    <ImageView
-        android:layout_width="22dp"
-        android:layout_height="31dp"
-        android:src="@drawable/locked"
-        android:layout_gravity="center"/>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
+        <ImageView
+            android:id="@+id/iv_2"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:background="@drawable/circle" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="31dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/camera" />
+    </RelativeLayout>
 </FrameLayout>

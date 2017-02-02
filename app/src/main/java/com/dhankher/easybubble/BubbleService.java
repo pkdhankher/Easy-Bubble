@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
@@ -31,7 +32,7 @@ import static android.content.ContentValues.TAG;
 
 public class BubbleService extends Service {
 
-    WindowManager windowManager;
+    public static WindowManager windowManager;
     WindowManager.LayoutParams bubbleParams, removeParams, sub_bubbles_layoutParams1, sub_bubbles_layoutParams2, sub_bubbles_layoutParams3, sub_bubbles_layoutParams4, sub_bubbles_layoutParams5;
     LayoutInflater layoutInflater;
     FrameLayout bubbleLayout, removeLayout, subBubblesLayout, imgframe, sub_bubbles_layout1, sub_bubbles_layout2, sub_bubbles_layout3, sub_bubbles_layout4, sub_bubbles_layout5;
@@ -49,8 +50,12 @@ public class BubbleService extends Service {
     private final static int ANIMATION_DURATION_SLOW = 500;
     private boolean isBubbleMove = false;
     String bubblePosition;
-    int screenheight_percent = 0;
-    int screenWidth_percent = 0;
+    public static int screenheight_percent = 0;
+    public static int screenWidth_percent = 0;
+    Context context;
+    BubbleService bubbleService;
+    AddingViewClass addingViewClass;
+    WindowManager.LayoutParams currentVIew, previousView;
 
 
     @Nullable
@@ -62,8 +67,8 @@ public class BubbleService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "screenheight_percent: "+screenheight_percent);
-        Log.i(TAG, "screenWidth_percent: "+screenWidth_percent);
+        context = this;
+        bubbleService = this;
         statusBarHeight = getStatusBarHeight();
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         Display display = windowManager.getDefaultDisplay();
@@ -76,68 +81,7 @@ public class BubbleService extends Service {
         screenheight_percent = screenHeight / 100;
         Log.d(TAG, "screenheight " + screenHeight);
 
-        Log.i(TAG, "screenheight_percent: "+screenheight_percent);
-        Log.i(TAG, "screenWidth_percent: "+screenWidth_percent);
-
-
         layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        sub_bubbles_layout1 = (FrameLayout) layoutInflater.inflate(R.layout.sub_bubbles_layout1, null);
-        iv_1 = (ImageView) sub_bubbles_layout1.findViewById(R.id.iv_1);
-        sub_bubbles_layoutParams1 = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
-                        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH |
-                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                PixelFormat.TRANSLUCENT
-        );
-        sub_bubbles_layoutParams1.gravity = Gravity.TOP | Gravity.LEFT;
-        windowManager.addView(sub_bubbles_layout1, sub_bubbles_layoutParams1);
-
-        sub_bubbles_layout2 = (FrameLayout) layoutInflater.inflate(R.layout.sub_bubbles_layout2, null);
-        iv_2 = (ImageView) sub_bubbles_layout2.findViewById(R.id.iv_2);
-        sub_bubbles_layoutParams2 = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
-                        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH |
-                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                PixelFormat.TRANSLUCENT
-        );
-        sub_bubbles_layoutParams2.gravity = Gravity.TOP | Gravity.LEFT;
-        windowManager.addView(sub_bubbles_layout2, sub_bubbles_layoutParams2);
-
-
-        sub_bubbles_layout3 = (FrameLayout) layoutInflater.inflate(R.layout.sub_bubbles_layout3, null);
-        iv_3 = (ImageView) sub_bubbles_layout3.findViewById(R.id.iv_3);
-        sub_bubbles_layoutParams3 = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
-                        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH |
-                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                PixelFormat.TRANSLUCENT
-        );
-        sub_bubbles_layoutParams3.gravity = Gravity.TOP | Gravity.LEFT;
-        windowManager.addView(sub_bubbles_layout3, sub_bubbles_layoutParams3);
-
-
-        sub_bubbles_layout4 = (FrameLayout) layoutInflater.inflate(R.layout.sub_bubbles_layout4, null);
-        iv_4 = (ImageView) sub_bubbles_layout4.findViewById(R.id.iv_4);
-        sub_bubbles_layoutParams4 = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
-                        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH |
-                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                PixelFormat.TRANSLUCENT
-        );
-        sub_bubbles_layoutParams4.gravity = Gravity.TOP | Gravity.LEFT;
-        windowManager.addView(sub_bubbles_layout4, sub_bubbles_layoutParams4);
 
 
         sub_bubbles_layout5 = (FrameLayout) layoutInflater.inflate(R.layout.sub_bubbles_layout5, null);
@@ -154,6 +98,16 @@ public class BubbleService extends Service {
         sub_bubbles_layoutParams5.gravity = Gravity.TOP | Gravity.LEFT;
         windowManager.addView(sub_bubbles_layout5, sub_bubbles_layoutParams5);
 
+        sub_bubbles_layout5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                for (int i = 0; i < 5; i++) {
+                    addView(i);
+                }
+            }
+        });
+
+//
 
         bubbleLayout = (FrameLayout) layoutInflater.inflate(R.layout.main_bubble, null);
         iv_innerCircle = (ImageView) bubbleLayout.findViewById(R.id.iv_InnerCircle);
@@ -214,11 +168,12 @@ public class BubbleService extends Service {
                         if (isLongClick) {
 
                             iv_innerPlus.setVisibility(View.GONE);
-                            sub_bubbles_layout1.setVisibility(View.GONE);
-                            sub_bubbles_layout2.setVisibility(View.GONE);
-                            sub_bubbles_layout3.setVisibility(View.GONE);
-                            sub_bubbles_layout4.setVisibility(View.GONE);
+//                            sub_bubbles_layout1.setVisibility(View.GONE);
+//                            sub_bubbles_layout2.setVisibility(View.GONE);
+//                            sub_bubbles_layout3.setVisibility(View.GONE);
+//                            sub_bubbles_layout4.setVisibility(View.GONE);
                             sub_bubbles_layout5.setVisibility(View.GONE);
+                            isClicked = false;
                             isClicked = false;
                             iv_bubble.animate().scaleX(1f).scaleY(1f).setDuration(ANIMATION_DURATION_MEDIUM).setInterpolator(new OvershootInterpolator());
                             iv_innerCircle.setVisibility(View.VISIBLE);
@@ -361,15 +316,12 @@ public class BubbleService extends Service {
                         }
 
                         if ((pointerX > (removeViewX - 120) && pointerX < (removeViewX + 120 + (radius * 2))) && (pointerY > (removeViewY - 120) && pointerY < (removeViewY + 120))) {
-                            objectAnimatorTowardsRemoveView.removeAllUpdateListeners();
-                            objectAnimatorAwayFromRemoveView.removeAllUpdateListeners();
-                            
                             windowManager.removeViewImmediate(bubbleLayout);
                             windowManager.removeViewImmediate(removeLayout);
-                            windowManager.removeViewImmediate(sub_bubbles_layout1);
-                            windowManager.removeViewImmediate(sub_bubbles_layout2);
-                            windowManager.removeViewImmediate(sub_bubbles_layout3);
-                            windowManager.removeViewImmediate(sub_bubbles_layout4);
+//                            windowManager.removeViewImmediate(sub_bubbles_layout1);
+//                            windowManager.removeViewImmediate(sub_bubbles_layout2);
+//                            windowManager.removeViewImmediate(sub_bubbles_layout3);
+//                            windowManager.removeViewImmediate(sub_bubbles_layout4);
                             windowManager.removeViewImmediate(sub_bubbles_layout5);
                             stopSelf();
                         }
@@ -399,16 +351,35 @@ public class BubbleService extends Service {
 
     }
 
+    private void addView(int position) {
+
+        sub_bubbles_layout4 = (FrameLayout) layoutInflater.inflate(R.layout.sub_bubbles_layout4, null);
+        iv_4 = (ImageView) sub_bubbles_layout4.findViewById(R.id.iv_4);
+        sub_bubbles_layoutParams4 = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
+                        WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH |
+                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                PixelFormat.TRANSLUCENT
+        );
+        sub_bubbles_layoutParams4.gravity = Gravity.TOP | Gravity.LEFT;
+
+        addingViewClass.addView(sub_bubbles_layout4, sub_bubbles_layoutParams4, position, pointerX, pointerY);
+    }
+
     private boolean isClicked = false;
 
 
     private void bubbleLayout_click() {
 
+
         if (isClicked) {
 
             iv_bubble.animate().scaleX(1f).scaleY(1f).setDuration(ANIMATION_DURATION_MEDIUM).setInterpolator(new OvershootInterpolator());
             iv_innerCircle.setVisibility(View.VISIBLE);
-            iv_innerPlus.animate().setDuration(ANIMATION_DURATION_SLOW).rotation(-135);
+            iv_innerPlus.animate().setDuration(ANIMATION_DURATION_SLOW).rotation(-45);
             iv_innerPlus.setVisibility(View.GONE);
             if (isBubbleLeft) {
                 collapseAllLeft();
@@ -424,7 +395,7 @@ public class BubbleService extends Service {
             iv_bubble.animate().scaleX(.85f).scaleY(.85f).setDuration(ANIMATION_DURATION_MEDIUM).setInterpolator(new OvershootInterpolator());
             iv_innerCircle.setVisibility(View.GONE);
             iv_innerPlus.setVisibility(View.VISIBLE);
-            iv_innerPlus.animate().setDuration(ANIMATION_DURATION_SLOW).rotation(135);
+            iv_innerPlus.animate().setDuration(ANIMATION_DURATION_SLOW).rotation(45);
             ObjectAnimator objectAnimator = new ObjectAnimator();
 
             // bubble is in the left assumed here
@@ -561,49 +532,49 @@ public class BubbleService extends Service {
     }
 
     private void expandAllRight() {
-        expand(screenWidth - (2 * radius), pointerY, (screenWidth - (2 * screenWidth_percent) - (2 * radius)), pointerY - (18 * screenheight_percent), sub_bubbles_layout1, sub_bubbles_layoutParams1);
-
-        expand(screenWidth - (2 * radius), pointerY, screenWidth - (2 * radius) - (23 * (screenWidth_percent)), pointerY - (13 * (screenheight_percent)), sub_bubbles_layout2, sub_bubbles_layoutParams2);
-
-        expand(screenWidth - (2 * radius), pointerY, screenWidth - (2 * radius) - (30 * (screenWidth_percent)), pointerY, sub_bubbles_layout3, sub_bubbles_layoutParams3);
-
-        expand(screenWidth - (2 * radius), pointerY, screenWidth - (2 * radius) - (23 * (screenWidth_percent)), pointerY + (13 * (screenheight_percent)), sub_bubbles_layout4, sub_bubbles_layoutParams4);
+//        expand(screenWidth - (2 * radius), pointerY, (screenWidth - (2 * screenWidth_percent) - (2 * radius)), pointerY - (18 * screenheight_percent), sub_bubbles_layout1, sub_bubbles_layoutParams1);
+//
+//        expand(screenWidth - (2 * radius), pointerY, screenWidth - (2 * radius) - (23 * (screenWidth_percent)), pointerY - (13 * (screenheight_percent)), sub_bubbles_layout2, sub_bubbles_layoutParams2);
+//
+//        expand(screenWidth - (2 * radius), pointerY, screenWidth - (2 * radius) - (30 * (screenWidth_percent)), pointerY, sub_bubbles_layout3, sub_bubbles_layoutParams3);
+//
+//        expand(screenWidth - (2 * radius), pointerY, screenWidth - (2 * radius) - (23 * (screenWidth_percent)), pointerY + (13 * (screenheight_percent)), sub_bubbles_layout4, sub_bubbles_layoutParams4);
 
         expand(screenWidth - (2 * radius), pointerY, (screenWidth - (2 * screenWidth_percent) - (2 * radius)), pointerY + (18 * screenheight_percent), sub_bubbles_layout5, sub_bubbles_layoutParams5);
     }
 
     private void expandAllLeft() {
-        expand(0, pointerY, (2 * (screenWidth_percent)), pointerY - (18 * (screenheight_percent)), sub_bubbles_layout1, sub_bubbles_layoutParams1);
-
-        expand(0, pointerY, (23 * (screenWidth_percent)), pointerY - (13 * (screenheight_percent)), sub_bubbles_layout2, sub_bubbles_layoutParams2);
-
-        expand(0, pointerY, (30 * (screenWidth_percent)), pointerY, sub_bubbles_layout3, sub_bubbles_layoutParams3);
-
-        expand(0, pointerY, (23 * (screenWidth_percent)), pointerY + (13 * (screenheight_percent)), sub_bubbles_layout4, sub_bubbles_layoutParams4);
+//        expand(0, pointerY, (2 * (screenWidth_percent)), pointerY - (18 * (screenheight_percent)), sub_bubbles_layout1, sub_bubbles_layoutParams1);
+//
+//        expand(0, pointerY, (23 * (screenWidth_percent)), pointerY - (13 * (screenheight_percent)), sub_bubbles_layout2, sub_bubbles_layoutParams2);
+//
+//        expand(0, pointerY, (30 * (screenWidth_percent)), pointerY, sub_bubbles_layout3, sub_bubbles_layoutParams3);
+//
+//        expand(0, pointerY, (23 * (screenWidth_percent)), pointerY + (13 * (screenheight_percent)), sub_bubbles_layout4, sub_bubbles_layoutParams4);
 
         expand(0, pointerY, (2 * (screenWidth_percent)), pointerY + (18 * (screenheight_percent)), sub_bubbles_layout5, sub_bubbles_layoutParams5);
     }
 
     private void collapseAllRight() {
-        collapse((screenWidth - (2 * screenWidth_percent) - (2 * radius)), pointerY - (18 * screenheight_percent), screenWidth - (2 * radius), pointerY, sub_bubbles_layout1, sub_bubbles_layoutParams1);
-
-        collapse(screenWidth - (2 * radius) - (23 * (screenWidth_percent)), pointerY - (13 * (screenheight_percent)), screenWidth - (2 * radius), pointerY, sub_bubbles_layout2, sub_bubbles_layoutParams2);
-
-        collapse(screenWidth - (2 * radius) - (30 * (screenWidth_percent)), pointerY, screenWidth - (2 * radius), pointerY, sub_bubbles_layout3, sub_bubbles_layoutParams3);
-
-        collapse(screenWidth - (2 * radius) - (23 * (screenWidth_percent)), pointerY + (13 * (screenheight_percent)), screenWidth - (2 * radius), pointerY, sub_bubbles_layout4, sub_bubbles_layoutParams4);
+//        collapse((screenWidth - (2 * screenWidth_percent) - (2 * radius)), pointerY - (18 * screenheight_percent), screenWidth - (2 * radius), pointerY, sub_bubbles_layout1, sub_bubbles_layoutParams1);
+//
+//        collapse(screenWidth - (2 * radius) - (23 * (screenWidth_percent)), pointerY - (13 * (screenheight_percent)), screenWidth - (2 * radius), pointerY, sub_bubbles_layout2, sub_bubbles_layoutParams2);
+//
+//        collapse(screenWidth - (2 * radius) - (30 * (screenWidth_percent)), pointerY, screenWidth - (2 * radius), pointerY, sub_bubbles_layout3, sub_bubbles_layoutParams3);
+//
+//        collapse(screenWidth - (2 * radius) - (23 * (screenWidth_percent)), pointerY + (13 * (screenheight_percent)), screenWidth - (2 * radius), pointerY, sub_bubbles_layout4, sub_bubbles_layoutParams4);
 
         collapse((screenWidth - (2 * screenWidth_percent) - (2 * radius)), pointerY + (18 * screenheight_percent), screenWidth - (2 * radius), pointerY, sub_bubbles_layout5, sub_bubbles_layoutParams5);
     }
 
     private void collapseAllLeft() {
-        collapse(2 * screenWidth_percent, pointerY - 18 * screenheight_percent, 0, pointerY, sub_bubbles_layout1, sub_bubbles_layoutParams1);
-
-        collapse(23 * screenWidth_percent, pointerY - 13 * screenheight_percent, 0, pointerY, sub_bubbles_layout2, sub_bubbles_layoutParams2);
-
-        collapse(30 * screenWidth_percent, pointerY, 0, pointerY, sub_bubbles_layout3, sub_bubbles_layoutParams3);
-
-        collapse(23 * screenWidth_percent, pointerY + 13 * screenheight_percent, 0, pointerY, sub_bubbles_layout4, sub_bubbles_layoutParams4);
+//        collapse(2 * screenWidth_percent, pointerY - 18 * screenheight_percent, 0, pointerY, sub_bubbles_layout1, sub_bubbles_layoutParams1);
+//
+//        collapse(23 * screenWidth_percent, pointerY - 13 * screenheight_percent, 0, pointerY, sub_bubbles_layout2, sub_bubbles_layoutParams2);
+//
+//        collapse(30 * screenWidth_percent, pointerY, 0, pointerY, sub_bubbles_layout3, sub_bubbles_layoutParams3);
+//
+//        collapse(23 * screenWidth_percent, pointerY + 13 * screenheight_percent, 0, pointerY, sub_bubbles_layout4, sub_bubbles_layoutParams4);
 
         collapse(2 * screenWidth_percent, pointerY + 18 * screenheight_percent, 0, pointerY, sub_bubbles_layout5, sub_bubbles_layoutParams5);
     }
@@ -626,11 +597,14 @@ public class BubbleService extends Service {
                 subLayoutParams.x = (int) currentX;
                 subLayoutParams.y = (int) currentY;
                 windowManager.updateViewLayout(subLayout, subLayoutParams);
-
             }
         });
         objectAnimator.start();
         subLayout.setVisibility(View.VISIBLE);
+        ///////////////////////////////////////////////////////////////
+        int finalXofBubbleLayout = bubbleParams.x;
+        int finalYofBubbleLayout = bubbleParams.y;
+
     }
 
 
@@ -652,40 +626,32 @@ public class BubbleService extends Service {
                 subLayoutParams.y = (int) currentY;
                 windowManager.updateViewLayout(subLayout, subLayoutParams);
 
-//               Handler handler = new Handler();
-
             }
         });
         objectAnimator.start();
         objectAnimator.addListener(new Animator.AnimatorListener() {
             @Override
-            public void onAnimationStart(Animator animation) {
+            public void onAnimationStart(Animator animator) {
 
             }
 
             @Override
-            public void onAnimationEnd(Animator animation) {
-
-                sub_bubbles_layout1.setVisibility(View.GONE);
-                sub_bubbles_layout2.setVisibility(View.GONE);
-                sub_bubbles_layout3.setVisibility(View.GONE);
-                sub_bubbles_layout4.setVisibility(View.GONE);
-                sub_bubbles_layout5.setVisibility(View.GONE);
+            public void onAnimationEnd(Animator animator) {
+                subLayout.setVisibility(View.GONE);
             }
 
             @Override
-            public void onAnimationCancel(Animator animation) {
+            public void onAnimationCancel(Animator animator) {
 
             }
 
             @Override
-            public void onAnimationRepeat(Animator animation) {
+            public void onAnimationRepeat(Animator animator) {
 
             }
         });
 
     }
-
 
     public int getStatusBarHeight() {
         int result = 0;
@@ -694,5 +660,9 @@ public class BubbleService extends Service {
             result = getResources().getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+
+    public BubbleService getInstance() {
+        return bubbleService;
     }
 }
