@@ -56,7 +56,6 @@ public class BubbleService extends Service {
     static BubbleService bubbleService;
     AddingViewClass addingViewClass;
     WindowManager.LayoutParams currentVIew, previousView;
-    private static Updatable updatable;
 
     @Nullable
     @Override
@@ -270,7 +269,6 @@ public class BubbleService extends Service {
                             }
                             isBubbleMove = true;
                         }
-                        updatable.onCoordinateUpdate(bubbleParams.x, bubbleParams.y);
                         break;
                     case MotionEvent.ACTION_UP:
                         isLongClick = false;
@@ -351,10 +349,6 @@ public class BubbleService extends Service {
             }
         });
 
-    }
-
-    public static void setUpdatable(Updatable updatable) {
-        BubbleService.updatable = updatable;
     }
 
     private void addView(int position) {

@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
         adapter = new GenerateViews(this);
         addingViewClass=  new AddingViewClass(this,adapter);
         startService(new Intent(MainActivity.this, BubbleService.class));
-        BubbleService.setUpdatable(adapter);
 
           finish();
 

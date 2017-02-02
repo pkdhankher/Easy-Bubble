@@ -17,7 +17,7 @@ import static com.dhankher.easybubble.BubbleService.screenheight_percent;
  * Created by hippo on 31/1/17.
  */
 
-public class GenerateViews extends Adapter implements GestureDetector.OnGestureListener,Updatable {
+public class GenerateViews extends Adapter implements GestureDetector.OnGestureListener {
     public static final String TAG = GenerateViews.class.getCanonicalName();
     BubbleService bubbleService;
     float x1, x2, x3, x4, x5, x6;
@@ -149,11 +149,5 @@ public class GenerateViews extends Adapter implements GestureDetector.OnGestureL
     @Override
     public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
         return false;
-    }
-
-    @Override
-    public void onCoordinateUpdate(int coordinateX, int coordinateY) {
-        Log.d(TAG, "onCoordinateUpdate: "+coordinateX);
-
     }
 }
