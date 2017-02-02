@@ -24,6 +24,8 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import org.greenrobot.eventbus.EventBus;
+
 import static android.content.ContentValues.TAG;
 
 /**
@@ -269,6 +271,7 @@ public class BubbleService extends Service {
                             }
                             isBubbleMove = true;
                         }
+                        EventBus.getDefault().post(new CoordinateEvent(bubbleParams.x, bubbleParams.y));
                         break;
                     case MotionEvent.ACTION_UP:
                         isLongClick = false;
@@ -277,7 +280,7 @@ public class BubbleService extends Service {
                             windowManager.removeViewImmediate(bubbleLayout);
                             windowManager.removeViewImmediate(removeLayout);
 //                            windowManager.removeViewImmediate(sub_bubbles_layout1);
-//                            windowManager.removeViewImmediate(sub_bubbles_layout2);
+//                            windowManager.removeViewImmediate(sub_bubbles_layout2)
 //                            windowManager.removeViewImmediate(sub_bubbles_layout3);
 //                            windowManager.removeViewImmediate(sub_bubbles_layout4);
                             windowManager.removeViewImmediate(sub_bubbles_layout5);

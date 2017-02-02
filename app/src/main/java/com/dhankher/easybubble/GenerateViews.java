@@ -10,6 +10,10 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import static com.dhankher.easybubble.BubbleService.screenWidth_percent;
 import static com.dhankher.easybubble.BubbleService.screenheight_percent;
 
@@ -30,9 +34,11 @@ public class GenerateViews extends Adapter implements GestureDetector.OnGestureL
     float cos45 = (float) Math.cos(Math.toRadians(45));
     float sin0 = (float) Math.sin(Math.toRadians(0));
     float cos0 = (float) Math.cos(Math.toRadians(0));
+    private int y;
 
     public GenerateViews(Context context) {
         super(context);
+        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -101,7 +107,7 @@ public class GenerateViews extends Adapter implements GestureDetector.OnGestureL
                 bubbleService.windowManager.addView(layout, layoutParams);
                 break;
         }
-       gestureDetector = new GestureDetector(this);
+        gestureDetector = new GestureDetector(this);
         layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -136,8 +142,8 @@ public class GenerateViews extends Adapter implements GestureDetector.OnGestureL
 
     @Override
     public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-        Toast.makeText(getContext(),"scrol",Toast.LENGTH_SHORT).show();
-        Log.d(TAG, "onScroll: "+motionEvent.getRawX());
+        Toast.makeText(getContext(), "scrol", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onScroll: " + motionEvent.getRawX());
         return false;
     }
 
@@ -150,4 +156,14 @@ public class GenerateViews extends Adapter implements GestureDetector.OnGestureL
     public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
         return false;
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(CoordinateEvent coordinateEvent) {
+        int x = coordinateEvent.getX();
+        int y = coordinateEvent.getY();
+
+        Log.d(TAG, "onMessageEvent: " + x + " " + y);
+    }
+
+    ;
 }
