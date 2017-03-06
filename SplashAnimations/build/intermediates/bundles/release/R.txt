@@ -1,0 +1,7 @@
+int id bottomView 0x7f030003
+int id bottomViewGreenLine 0x7f030004
+int id centerView 0x7f030005
+int id parentView 0x7f030000
+int id topView 0x7f030001
+int id topViewGreenLine 0x7f030002
+int layout layout_splash_animation 0x7f020000

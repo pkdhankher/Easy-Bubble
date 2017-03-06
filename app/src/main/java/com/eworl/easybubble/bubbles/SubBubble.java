@@ -200,7 +200,7 @@ public class SubBubble {
             }
         }
         Toast.makeText(context,log_list.get(this.getId()).getAppName()+" clicked",Toast.LENGTH_SHORT).show();
-        masterBubble.toggle();
+//        masterBubble.toggle();
     }
 
     public void setIcon(Drawable iconId) {

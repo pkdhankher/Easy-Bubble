@@ -30,14 +30,10 @@ public class MasterBubble {
     private static final String TAG = MasterBubble.class.getCanonicalName();
     private FrameLayout fmContentView, fmMasterBubble, fmOpenView, fmCloseView;
     private View innerRing;
-    Boolean isOpen = false;
+
     private FrameLayout flSubBubbleContainer;
     private Context context;
-    private boolean isAnimationOngoing = false;
-    private final static int ANIMATION_DURATION = 300;
-    //    private final static int ANIMATION_DURATION = 0;
-    private final static float BUBBLE_CLOSE_SIZE = 1f;
-    private final static float BUBBLE_OPEN_SIZE = .8f;
+
     private ValueGenerator valueGenerator;
     private ArrayList<SubBubble> subBubblesList = new ArrayList<>();
     private MasterBubbleTouchListener touchListener;
@@ -101,82 +97,8 @@ public class MasterBubble {
 
     private void setListeners() {
 
-        touchListener = new MasterBubbleTouchListener(this);
+        touchListener = new MasterBubbleTouchListener(this,fmOpenView, fmCloseView,flSubBubbleContainer);
         fmMasterBubble.setOnTouchListener(touchListener);
-    }
-
-    public void toggle() {
-        if (isAnimationOngoing) return;
-
-        if (isOpen)
-            close();
-        else
-            open();
-    }
-
-    void close() {
-        fmOpenView.clearAnimation();
-        fmCloseView.clearAnimation();
-
-        flSubBubbleContainer.setVisibility(View.INVISIBLE);
-        isAnimationOngoing = true;
-        fmCloseView.animate()
-                .setDuration(ANIMATION_DURATION)
-                .scaleX(BUBBLE_CLOSE_SIZE)
-                .scaleY(BUBBLE_CLOSE_SIZE)
-                .setListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        fmOpenView.setVisibility(View.VISIBLE);
-                        isAnimationOngoing = false;
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
-
-                    }
-                })
-                .rotation(0);
-        isOpen = false;
-    }
-
-    void open() {
-        fmOpenView.clearAnimation();
-        fmCloseView.clearAnimation();
-
-        flSubBubbleContainer.setVisibility(View.VISIBLE);
-        fmOpenView.setVisibility(View.VISIBLE);
-        isAnimationOngoing = true;
-        fmCloseView.animate().setDuration(ANIMATION_DURATION)
-                .setInterpolator(new OvershootInterpolator())
-                .scaleX(BUBBLE_OPEN_SIZE)
-                .scaleY(BUBBLE_OPEN_SIZE)
-                .setListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-                    }
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        isAnimationOngoing = false;
-                    }
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
-                    }
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
-                    }
-                }).rotation(45);
-        isOpen = true;
     }
 
     public View getView() {

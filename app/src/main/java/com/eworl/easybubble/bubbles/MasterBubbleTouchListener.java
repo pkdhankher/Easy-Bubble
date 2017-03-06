@@ -1,5 +1,6 @@
 package com.eworl.easybubble.bubbles;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -7,6 +8,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.OvershootInterpolator;
+import android.widget.FrameLayout;
 
 import com.eworl.easybubble.ViewManager;
 import com.eworl.easybubble.eventBus.MasterBubbleInLeft;
@@ -25,6 +28,9 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
     private View fmContentViewLayout;
     private ViewManager viewManager = ViewManager.getRunningInstance();
     private long startTime, endTime;
+    private final static int ANIMATION_DURATION = 300;
+    private final static float BUBBLE_CLOSE_SIZE = 1f;
+    private final static float BUBBLE_OPEN_SIZE = .8f;
     private static final int STATUS_BAR_HEIGHT = 48;
     private static final int TEMP_RADIUS = 50;
     //    private final WindowManager.LayoutParams fmContentViewParams;
@@ -32,13 +38,19 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
     private int radius, screenWidth, screenHeight;
     private int latestPointerX, latestPointerY;
     private Context context;
+    private FrameLayout fmOpenView, fmCloseView,flSubBubbleContainer;
     private WindowManager.LayoutParams fmContentViewParams;
+    private Boolean isOpen = false;
+    private boolean isAnimationOngoing = false;
 
 
-    public MasterBubbleTouchListener(MasterBubble masterBubble) {
+    public MasterBubbleTouchListener(MasterBubble masterBubble, FrameLayout fmOpenView, FrameLayout fmCloseView, FrameLayout flSubBubbleContainer) {
         this.masterBubble = masterBubble;
         fmContentViewLayout = masterBubble.getView();
         this.context = masterBubble.getContext();
+        this.fmCloseView = fmCloseView;
+        this.fmOpenView = fmOpenView;
+        this.flSubBubbleContainer = flSubBubbleContainer;
 //        fmContentViewParams = (WindowManager.LayoutParams) fmContentViewLayout.getLayoutParams();
         ValueGenerator valueGenerator = masterBubble.getValueGenerator();
         radius = valueGenerator.getRadius();
@@ -87,8 +99,8 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
     }
 
     private void performeActionMove(MotionEvent motionEvent) {
-        if (masterBubble.isOpen) {
-            masterBubble.close();
+        if (isOpen) {
+            close();
         }
 
         pointerX = motionEvent.getRawX();
@@ -177,8 +189,80 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
 
     private void masterBubbleClickListener() {
 
-        masterBubble.toggle();
+        toggle();
+    }
+    public void toggle() {
+        if (isAnimationOngoing) return;
+
+        if (isOpen)
+            close();
+        else
+            open();
     }
 
+    void close() {
+        fmOpenView.clearAnimation();
+        fmCloseView.clearAnimation();
+
+        flSubBubbleContainer.setVisibility(View.INVISIBLE);
+        isAnimationOngoing = true;
+        fmCloseView.animate()
+                .setDuration(ANIMATION_DURATION)
+                .scaleX(BUBBLE_CLOSE_SIZE)
+                .scaleY(BUBBLE_CLOSE_SIZE)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        fmOpenView.setVisibility(View.VISIBLE);
+                        isAnimationOngoing = false;
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                })
+                .rotation(0);
+        isOpen = false;
+    }
+
+    void open() {
+        fmOpenView.clearAnimation();
+        fmCloseView.clearAnimation();
+
+        flSubBubbleContainer.setVisibility(View.VISIBLE);
+        fmOpenView.setVisibility(View.VISIBLE);
+        isAnimationOngoing = true;
+        fmCloseView.animate().setDuration(ANIMATION_DURATION)
+                .setInterpolator(new OvershootInterpolator())
+                .scaleX(BUBBLE_OPEN_SIZE)
+                .scaleY(BUBBLE_OPEN_SIZE)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+                    }
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        isAnimationOngoing = false;
+                    }
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+                    }
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+                    }
+                }).rotation(45);
+        isOpen = true;
+    }
 
 }
