@@ -106,7 +106,7 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
     }
 
     private void performeActionMove(MotionEvent motionEvent) {
-        if(!isLongPressed){
+        if (!isLongPressed) {
             return;
         }
 
@@ -145,7 +145,9 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
         if ((endTime - startTime) < 200) {
             masterBubbleClickListener();
         }
-
+if((fmContentViewParams.x) == (0 - radius) || ((fmContentViewParams.x) == ((screenWidth - ((2 * TEMP_RADIUS)) - radius)))){
+    return;
+}
         if (pointerX < (screenWidth / 2)) {
             masterBubbleInLeft();
             ObjectAnimator objectAnimator = new ObjectAnimator();
@@ -210,7 +212,6 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
     }
 
     private void masterBubbleClickListener() {
-
         toggle();
     }
 
