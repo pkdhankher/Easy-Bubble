@@ -1,1 +1,1 @@
-include ':app', ':SplashAnimations'
+include ':app', ':greendao-generator'

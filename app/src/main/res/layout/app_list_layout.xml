@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:id="@+id/flRecycleItem"
+    android:clickable="true">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+
+        <ImageView
+            android:id="@+id/appIcon"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:contentDescription="@string/action_settings"
+            android:scaleType="fitCenter"
+            android:src="@drawable/three" />
+
+        <TextView
+            android:id="@+id/country_name"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:layout_below="@id/appIcon"
+            android:gravity="center"
+            android:text="@string/country_name"
+            android:textColor="#fff"
+            android:textSize="13sp" />
+
+    </RelativeLayout>
+
+
+</FrameLayout>

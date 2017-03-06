@@ -1,0 +1,22 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fmContentView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <FrameLayout
+        android:id="@+id/fmSubBubbleView"
+        android:layout_width="@dimen/sub_bubble_size"
+        android:layout_height="@dimen/sub_bubble_size"
+        android:background="@drawable/grey_circle"
+        android:clickable="true">
+
+        <ImageView
+            android:id="@+id/ivIcon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp" />
+
+    </FrameLayout>
+
+
+</FrameLayout>
