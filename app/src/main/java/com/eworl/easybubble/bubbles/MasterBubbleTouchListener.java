@@ -13,11 +13,15 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 
 import com.eworl.easybubble.ViewManager;
+import com.eworl.easybubble.eventBus.CloseSubBubblesEvent;
 import com.eworl.easybubble.eventBus.MasterBubbleInLeft;
 import com.eworl.easybubble.eventBus.MasterBubbleInRight;
+import com.eworl.easybubble.eventBus.RotateSubBubbleEvent;
 import com.eworl.easybubble.utils.ValueGenerator;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 /**
  * Created by root on 3/2/17.
@@ -62,7 +66,7 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
         ViewManager viewManager = ViewManager.getRunningInstance();
         screenWidth = viewManager.getScreenWidth();
         screenHeight = viewManager.getScreenHeight();
-
+        EventBus.getDefault().register(this);
 
     }
 
@@ -299,4 +303,9 @@ Handler handler = new Handler();
             flSubBubbleContainer.setVisibility(View.INVISIBLE);
         }
     };
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(CloseSubBubblesEvent event) {
+        close();
+    }
 }

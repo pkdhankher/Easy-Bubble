@@ -18,14 +18,17 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import com.eworl.easybubble.R;
 import com.eworl.easybubble.db.Program;
+import com.eworl.easybubble.eventBus.CloseSubBubblesEvent;
 import com.eworl.easybubble.eventBus.MasterBubbleInLeft;
 import com.eworl.easybubble.eventBus.MasterBubbleInRight;
 import com.eworl.easybubble.eventBus.RotateSubBubbleEvent;
 import com.eworl.easybubble.eventBus.PointerYDiffEvent;
 import com.eworl.easybubble.utils.Coordinate;
 import com.eworl.easybubble.utils.ValueGenerator;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -46,12 +49,12 @@ public class SubBubble {
     private Drawable iconId;
     private int id;
     private Coordinate coordinates;
-    private float pointerDownY, pointerDownX,pointerUpY;
+    private float pointerDownY, pointerDownX, pointerUpY;
     private ValueGenerator valueGenerator;
     private MasterBubble masterBubble2nd;
     private long startTime, endTime;
     private int radius;
-    private float diffY,pointerYdiff,moveY;
+    private float diffY, pointerYdiff, moveY;
     private FrameLayout.LayoutParams fmContentViewParams;
     private boolean masterBubbleInRight = false;
     private List<Program> log_list;
@@ -109,7 +112,7 @@ public class SubBubble {
 
     private void performeActionMove(MotionEvent motionEvent) {
 
-         moveY = motionEvent.getRawY();
+        moveY = motionEvent.getRawY();
         diffY = pointerDownY - moveY;
         if (masterBubbleInRight) {
             diffY = -(pointerDownY - moveY);
@@ -167,9 +170,9 @@ public class SubBubble {
             startMain.addCategory(Intent.CATEGORY_HOME);
             context.startActivity(startMain);
 
-        }else if(log_list.get(this.getId()).getPackageName().equals("com.lock")){
+        } else if (log_list.get(this.getId()).getPackageName().equals("com.lock")) {
 
-            DevicePolicyManager    dpm = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+            DevicePolicyManager dpm = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
             try {
                 dpm.lockNow();
 
@@ -180,12 +183,12 @@ public class SubBubble {
 //                startActivityForResult(it, 0);
             }
 
-        }else if(log_list.get(this.getId()).getPackageName().equals("com.back")){
+        } else if (log_list.get(this.getId()).getPackageName().equals("com.back")) {
 
             startMain.addCategory(Intent.CATEGORY_HOME);
             context.startActivity(startMain);
 
-        }else {
+        } else {
             Intent i;
             PackageManager manager = context.getPackageManager();
             try {
@@ -199,8 +202,8 @@ public class SubBubble {
 
             }
         }
-        Toast.makeText(context,log_list.get(this.getId()).getAppName()+" clicked",Toast.LENGTH_SHORT).show();
-//        masterBubble.toggle();
+        Toast.makeText(context, log_list.get(this.getId()).getAppName() + " clicked", Toast.LENGTH_SHORT).show();
+        EventBus.getDefault().post(new CloseSubBubblesEvent());
     }
 
     public void setIcon(Drawable iconId) {
