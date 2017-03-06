@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <ImageView
+            android:id="@+id/appIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:contentDescription="@string/action_settings"
+            android:src="@drawable/three"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/country_name"
+            android:layout_width="240dp"
+            android:layout_height="60dp"
+            android:textSize="13sp"
+            android:text="@string/country_name"
+            android:textColor="#fff"
+            android:gravity="center|left"
+            android:layout_marginLeft="60dp"
+            android:paddingLeft="30dp" />
+
+        <ImageView
+            android:id="@+id/greenIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:contentDescription="@string/action_settings"
+            android:background="#5b2df113"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            />
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/plus"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="8dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/plusIcon"
+            />
+
+    </RelativeLayout>
+
+
+</RelativeLayout>
