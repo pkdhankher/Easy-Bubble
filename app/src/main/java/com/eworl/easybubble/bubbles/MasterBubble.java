@@ -48,9 +48,11 @@ public class MasterBubble {
 
 
 
+
     public MasterBubble(Context context, List<Program> log_list) {
         this.context = context;
         this.log_list = log_list;
+
 
         intializeValueGenerator();
         intializeViews();

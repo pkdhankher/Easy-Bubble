@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -38,10 +39,13 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
     private int radius, screenWidth, screenHeight;
     private int latestPointerX, latestPointerY;
     private Context context;
-    private FrameLayout fmOpenView, fmCloseView,flSubBubbleContainer;
+    private FrameLayout fmOpenView, fmCloseView, flSubBubbleContainer;
     private WindowManager.LayoutParams fmContentViewParams;
-    private Boolean isOpen = false;
+    private boolean isOpen = false;
+    private boolean isMasterBubbleMoving = false;
     private boolean isAnimationOngoing = false;
+    private Boolean isLongPressed = false;
+    private Handler clickHandler = new Handler();
 
 
     public MasterBubbleTouchListener(MasterBubble masterBubble, FrameLayout fmOpenView, FrameLayout fmCloseView, FrameLayout flSubBubbleContainer) {
@@ -66,20 +70,23 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         switch (motionEvent.getAction()) {
+
             case MotionEvent.ACTION_DOWN:
+                isLongPressed = false;
                 performeActionDown(motionEvent);
                 break;
+
             case MotionEvent.ACTION_MOVE:
                 performeActionMove(motionEvent);
                 break;
+
             case MotionEvent.ACTION_UP:
                 setLatestPointerX(motionEvent);
                 setLatestPointerY(motionEvent);
                 performeActionUp(motionEvent);
-
                 break;
         }
-        return false;
+        return true;
     }
 
     private void setLatestPointerY(MotionEvent motionEvent) {
@@ -99,10 +106,16 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
     }
 
     private void performeActionMove(MotionEvent motionEvent) {
+        if(!isLongPressed){
+            return;
+        }
+
         if (isOpen) {
             close();
         }
 
+        isOpen = false;
+        isMasterBubbleMoving = true;
         pointerX = motionEvent.getRawX();
         pointerY = motionEvent.getRawY();
         fmContentViewParams = (WindowManager.LayoutParams) fmContentViewLayout.getLayoutParams();
@@ -114,17 +127,25 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
 
     private void performeActionDown(MotionEvent motionEvent) {
         startTime = System.currentTimeMillis();
+
+        clickHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                isLongPressed = true;
+            }
+        }, 200);
     }
 
     private void performeActionUp(MotionEvent motionEvent) {
-
+        clickHandler.removeCallbacksAndMessages(null);
         endTime = System.currentTimeMillis();
-        if ((endTime - startTime) < 200) {
-            masterBubbleClickListener();
-
-        }
 
         final WindowManager.LayoutParams fmContentViewParams = (WindowManager.LayoutParams) fmContentViewLayout.getLayoutParams();
+
+        if ((endTime - startTime) < 200) {
+            masterBubbleClickListener();
+        }
+
         if (pointerX < (screenWidth / 2)) {
             masterBubbleInLeft();
             ObjectAnimator objectAnimator = new ObjectAnimator();
@@ -138,12 +159,12 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
                     float current = (int) value;
                     fmContentViewParams.x = (int) current;
                     fmContentViewParams.y = (int) (pointerY - (STATUS_BAR_HEIGHT + TEMP_RADIUS) - radius);
-                    if(pointerY<(2*TEMP_RADIUS)){
-                        fmContentViewParams.y = (int) (pointerY - (STATUS_BAR_HEIGHT + TEMP_RADIUS) - radius+(2*TEMP_RADIUS));
+                    if (pointerY < (2 * TEMP_RADIUS)) {
+                        fmContentViewParams.y = (int) (pointerY - (STATUS_BAR_HEIGHT + TEMP_RADIUS) - radius + (2 * TEMP_RADIUS));
                     }
 
-                    if(pointerY>(screenHeight-TEMP_RADIUS)){
-                        fmContentViewParams.y = (int) (pointerY - (STATUS_BAR_HEIGHT + TEMP_RADIUS) - radius-TEMP_RADIUS);
+                    if (pointerY > (screenHeight - TEMP_RADIUS)) {
+                        fmContentViewParams.y = (int) (pointerY - (STATUS_BAR_HEIGHT + TEMP_RADIUS) - radius - TEMP_RADIUS);
                     }
                     viewManager.updateViewLayout(fmContentViewLayout, fmContentViewParams);
                 }
@@ -151,7 +172,7 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
             objectAnimator.start();
         } else {
             masterBubbleInRight();
-           ObjectAnimator objectAnimator = new ObjectAnimator();
+            ObjectAnimator objectAnimator = new ObjectAnimator();
             objectAnimator.setDuration(500);
             float initial = pointerX - radius - TEMP_RADIUS;
             float finalV = (float) (screenWidth - ((2 * TEMP_RADIUS)) - radius);
@@ -176,13 +197,14 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
             });
             objectAnimator.start();
 
-
         }
+
     }
 
     private void masterBubbleInRight() {
         EventBus.getDefault().post(new MasterBubbleInRight());
     }
+
     private void masterBubbleInLeft() {
         EventBus.getDefault().post(new MasterBubbleInLeft());
     }
@@ -191,6 +213,7 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
 
         toggle();
     }
+
     public void toggle() {
         if (isAnimationOngoing) return;
 
@@ -203,8 +226,8 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
     void close() {
         fmOpenView.clearAnimation();
         fmCloseView.clearAnimation();
-
-        flSubBubbleContainer.setVisibility(View.INVISIBLE);
+        flSubBubbleContainer.animate().scaleX(0).scaleY(0).setDuration(300);
+//        flSubBubbleContainer.setVisibility(View.INVISIBLE);
         isAnimationOngoing = true;
         fmCloseView.animate()
                 .setDuration(ANIMATION_DURATION)
@@ -241,7 +264,8 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
         fmCloseView.clearAnimation();
 
         flSubBubbleContainer.setVisibility(View.VISIBLE);
-        fmOpenView.setVisibility(View.VISIBLE);
+        flSubBubbleContainer.animate().scaleX(1).scaleY(1).setDuration(300);
+        fmOpenView.setVisibility(View.GONE);
         isAnimationOngoing = true;
         fmCloseView.animate().setDuration(ANIMATION_DURATION)
                 .setInterpolator(new OvershootInterpolator())
@@ -251,13 +275,16 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
                     @Override
                     public void onAnimationStart(Animator animator) {
                     }
+
                     @Override
                     public void onAnimationEnd(Animator animator) {
                         isAnimationOngoing = false;
                     }
+
                     @Override
                     public void onAnimationCancel(Animator animator) {
                     }
+
                     @Override
                     public void onAnimationRepeat(Animator animator) {
                     }
