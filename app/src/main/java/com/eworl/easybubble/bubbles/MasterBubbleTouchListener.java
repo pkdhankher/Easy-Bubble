@@ -228,7 +228,7 @@ if((fmContentViewParams.x) == (0 - radius) || ((fmContentViewParams.x) == ((scre
         fmOpenView.clearAnimation();
         fmCloseView.clearAnimation();
         flSubBubbleContainer.animate().scaleX(0).scaleY(0).setDuration(300);
-//        flSubBubbleContainer.setVisibility(View.INVISIBLE);
+        handler.postDelayed(runnable,400);
         isAnimationOngoing = true;
         fmCloseView.animate()
                 .setDuration(ANIMATION_DURATION)
@@ -292,5 +292,11 @@ if((fmContentViewParams.x) == (0 - radius) || ((fmContentViewParams.x) == ((scre
                 }).rotation(45);
         isOpen = true;
     }
-
+Handler handler = new Handler();
+    Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            flSubBubbleContainer.setVisibility(View.INVISIBLE);
+        }
+    };
 }
