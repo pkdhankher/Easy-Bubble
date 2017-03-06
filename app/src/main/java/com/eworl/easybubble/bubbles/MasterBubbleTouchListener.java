@@ -167,7 +167,7 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
 
         }
     }
-    
+
     private void masterBubbleInRight() {
         EventBus.getDefault().post(new MasterBubbleInRight());
     }
