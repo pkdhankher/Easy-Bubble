@@ -149,9 +149,9 @@ public class MasterBubbleTouchListener implements View.OnTouchListener {
         if ((endTime - startTime) < 200) {
             masterBubbleClickListener();
         }
-if((fmContentViewParams.x) == (0 - radius) || ((fmContentViewParams.x) == ((screenWidth - ((2 * TEMP_RADIUS)) - radius)))){
-    return;
-}
+        if ((fmContentViewParams.x) == (0 - radius) || ((fmContentViewParams.x) == ((screenWidth - ((2 * TEMP_RADIUS)) - radius)))) {
+            return;
+        }
         if (pointerX < (screenWidth / 2)) {
             masterBubbleInLeft();
             ObjectAnimator objectAnimator = new ObjectAnimator();
@@ -232,7 +232,7 @@ if((fmContentViewParams.x) == (0 - radius) || ((fmContentViewParams.x) == ((scre
         fmOpenView.clearAnimation();
         fmCloseView.clearAnimation();
         flSubBubbleContainer.animate().scaleX(0).scaleY(0).setDuration(300);
-        handler.postDelayed(runnable,400);
+        handler.postDelayed(runnable, 400);
         isAnimationOngoing = true;
         fmCloseView.animate()
                 .setDuration(ANIMATION_DURATION)
@@ -296,7 +296,8 @@ if((fmContentViewParams.x) == (0 - radius) || ((fmContentViewParams.x) == ((scre
                 }).rotation(45);
         isOpen = true;
     }
-Handler handler = new Handler();
+
+    Handler handler = new Handler();
     Runnable runnable = new Runnable() {
         @Override
         public void run() {

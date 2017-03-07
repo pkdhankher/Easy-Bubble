@@ -194,11 +194,9 @@ public class MainActivity extends Activity implements Listener, CallBack {
         for (int i = 0; i < log_list.size(); i++) {
             SubBubble subBubble = new SubBubble(this, log_list, masterBubble);
             String img = log_list.get(i).getAppIcon();
-            Log.d(TAG, "img:" + img);
             byte[] bitmapdata = Base64.decode(img, Base64.DEFAULT);
             Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
             Drawable icon = new BitmapDrawable(getResources(), bitmap);
-            Log.d(TAG, "onCreate: " + icon);
             subBubble.setIcon(icon);
             subBubble.setId(i);
             masterBubble.addSubBubble(subBubble);
